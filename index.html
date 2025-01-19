@@ -1,0 +1,2029 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        #map {
+            width: 573px;
+            height: 739px;
+        }
+        </style>
+        <title></title>
+    </head>
+     <h1 style="font-family:Arial">UK Illegal Drug Atlas</h1>
+	<p style="font-family:Arial">The value for each drug is the number of times it was seized out of the total number of seisures, as a percentage.</p>
+	<p style="font-family:Arial">Click on an area to view detailed statistics.</p>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/Information_1.js"></script>
+        <script src="data/OtherClassC_2.js"></script>
+        <script src="data/OtherClassB_3.js"></script>
+        <script src="data/OtherClassA_4.js"></script>
+        <script src="data/NitrousOxide_5.js"></script>
+        <script src="data/Morphine_6.js"></script>
+        <script src="data/Amphetemines_7.js"></script>
+        <script src="data/LSD_8.js"></script>
+        <script src="data/Ketamine_9.js"></script>
+        <script src="data/Heroin_10.js"></script>
+        <script src="data/GHB_11.js"></script>
+        <script src="data/Ecstasy_12.js"></script>
+        <script src="data/Crack_13.js"></script>
+        <script src="data/Cocaine_14.js"></script>
+        <script src="data/Cannabis_15.js"></script>
+        <script src="data/Secondmostcommondrug_16.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[42.997498567592686,-8.859993318014299],[57.25067460597271,10.710451833274291]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane__0');
+        map.getPane('pane__0').style.zIndex = 400;
+        var layer__0 = L.tileLayer('https://cartocdn_a.global.ssl.fastly.net/base-eco/{z}/{x}/{y}.png', {
+            pane: 'pane__0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+        });
+        layer__0;
+        map.addLayer(layer__0);
+        function pop_Information_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Police Area</th>\
+                        <td>' + (feature.properties['Police Area'] !== null ? autolinker.link(feature.properties['Police Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cocaine Perc.</th>\
+                        <td>' + (feature.properties['Cocaine Perc.'] !== null ? autolinker.link(feature.properties['Cocaine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Crack Perc.</th>\
+                        <td>' + (feature.properties['Crack Perc.'] !== null ? autolinker.link(feature.properties['Crack Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ecstasy Perc.</th>\
+                        <td>' + (feature.properties['Ecstasy Perc.'] !== null ? autolinker.link(feature.properties['Ecstasy Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Heroin Perc.</th>\
+                        <td>' + (feature.properties['Heroin Perc.'] !== null ? autolinker.link(feature.properties['Heroin Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LSD Perc.</th>\
+                        <td>' + (feature.properties['LSD Perc.'] !== null ? autolinker.link(feature.properties['LSD Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Methadone Perc.</th>\
+                        <td>' + (feature.properties['Methadone Perc.'] !== null ? autolinker.link(feature.properties['Methadone Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Morphine Perc.</th>\
+                        <td>' + (feature.properties['Morphine Perc.'] !== null ? autolinker.link(feature.properties['Morphine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cannabis Perc.</th>\
+                        <td>' + (feature.properties['Cannabis Perc.'] !== null ? autolinker.link(feature.properties['Cannabis Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Amphetamines Perc.</th>\
+                        <td>' + (feature.properties['Amphetamines Perc.'] !== null ? autolinker.link(feature.properties['Amphetamines Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Barbiturates Perc.</th>\
+                        <td>' + (feature.properties['Barbiturates Perc.'] !== null ? autolinker.link(feature.properties['Barbiturates Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ketamine Perc.</th>\
+                        <td>' + (feature.properties['Ketamine Perc.'] !== null ? autolinker.link(feature.properties['Ketamine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Mephedrone Perc.</th>\
+                        <td>' + (feature.properties['Mephedrone Perc.'] !== null ? autolinker.link(feature.properties['Mephedrone Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GHB Perc.</th>\
+                        <td>' + (feature.properties['GHB Perc.'] !== null ? autolinker.link(feature.properties['GHB Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Anabolic Perc.</th>\
+                        <td>' + (feature.properties['Anabolic Perc.'] !== null ? autolinker.link(feature.properties['Anabolic Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Benzodiazepines Perc.</th>\
+                        <td>' + (feature.properties['Benzodiazepines Perc.'] !== null ? autolinker.link(feature.properties['Benzodiazepines Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Nitrous Oxide Perc.</th>\
+                        <td>' + (feature.properties['Nitrous Oxide Perc.'] !== null ? autolinker.link(feature.properties['Nitrous Oxide Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Temazepam Perc.</th>\
+                        <td>' + (feature.properties['Temazepam Perc.'] !== null ? autolinker.link(feature.properties['Temazepam Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Other Class B Perc.</th>\
+                        <td>' + (feature.properties['Other Class B Perc.'] !== null ? autolinker.link(feature.properties['Other Class B Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Other Class C Perc.</th>\
+                        <td>' + (feature.properties['Other Class C Perc.'] !== null ? autolinker.link(feature.properties['Other Class C Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Other Class A Perc.</th>\
+                        <td>' + (feature.properties['Other Class A Perc.'] !== null ? autolinker.link(feature.properties['Other Class A Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Number One</th>\
+                        <td>' + (feature.properties['Number One'] !== null ? autolinker.link(feature.properties['Number One'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Number Two</th>\
+                        <td>' + (feature.properties['Number Two'] !== null ? autolinker.link(feature.properties['Number Two'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Information_1_0() {
+            return {
+                pane: 'pane_Information_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(145,82,45,0.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Information_1');
+        map.getPane('pane_Information_1').style.zIndex = 401;
+        map.getPane('pane_Information_1').style['mix-blend-mode'] = 'normal';
+        var layer_Information_1 = new L.geoJson(json_Information_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Information_1',
+            layerName: 'layer_Information_1',
+            pane: 'pane_Information_1',
+            onEachFeature: pop_Information_1,
+            style: style_Information_1_0,
+        });
+        bounds_group.addLayer(layer_Information_1);
+        map.addLayer(layer_Information_1);
+        function pop_OtherClassC_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Class C Perc.'] !== null ? autolinker.link(feature.properties['Other Class C Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_OtherClassC_2_0(feature) {
+            if (feature.properties['Other Class C Perc.'] >= 0.000000 && feature.properties['Other Class C Perc.'] <= 0.452933 ) {
+                return {
+                pane: 'pane_OtherClassC_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Other Class C Perc.'] >= 0.452933 && feature.properties['Other Class C Perc.'] <= 1.217391 ) {
+                return {
+                pane: 'pane_OtherClassC_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Other Class C Perc.'] >= 1.217391 && feature.properties['Other Class C Perc.'] <= 2.621343 ) {
+                return {
+                pane: 'pane_OtherClassC_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Other Class C Perc.'] >= 2.621343 && feature.properties['Other Class C Perc.'] <= 6.040417 ) {
+                return {
+                pane: 'pane_OtherClassC_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Other Class C Perc.'] >= 6.040417 && feature.properties['Other Class C Perc.'] <= 11.358712 ) {
+                return {
+                pane: 'pane_OtherClassC_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_OtherClassC_2');
+        map.getPane('pane_OtherClassC_2').style.zIndex = 402;
+        map.getPane('pane_OtherClassC_2').style['mix-blend-mode'] = 'normal';
+        var layer_OtherClassC_2 = new L.geoJson(json_OtherClassC_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_OtherClassC_2',
+            layerName: 'layer_OtherClassC_2',
+            pane: 'pane_OtherClassC_2',
+            onEachFeature: pop_OtherClassC_2,
+            style: style_OtherClassC_2_0,
+        });
+        bounds_group.addLayer(layer_OtherClassC_2);
+        function pop_OtherClassB_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Class B Perc.'] !== null ? autolinker.link(feature.properties['Other Class B Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_OtherClassB_3_0(feature) {
+            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 23.236164 ) {
+                return {
+                pane: 'pane_OtherClassB_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 45.777989 ) {
+                return {
+                pane: 'pane_OtherClassB_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 45.777989 && feature.properties['Cannabis Perc.'] <= 63.899139 ) {
+                return {
+                pane: 'pane_OtherClassB_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 63.899139 && feature.properties['Cannabis Perc.'] <= 71.752165 ) {
+                return {
+                pane: 'pane_OtherClassB_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 71.752165 && feature.properties['Cannabis Perc.'] <= 82.418813 ) {
+                return {
+                pane: 'pane_OtherClassB_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_OtherClassB_3');
+        map.getPane('pane_OtherClassB_3').style.zIndex = 403;
+        map.getPane('pane_OtherClassB_3').style['mix-blend-mode'] = 'normal';
+        var layer_OtherClassB_3 = new L.geoJson(json_OtherClassB_3, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_OtherClassB_3',
+            layerName: 'layer_OtherClassB_3',
+            pane: 'pane_OtherClassB_3',
+            onEachFeature: pop_OtherClassB_3,
+            style: style_OtherClassB_3_0,
+        });
+        bounds_group.addLayer(layer_OtherClassB_3);
+        function pop_OtherClassA_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Class A Perc.'] !== null ? autolinker.link(feature.properties['Other Class A Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_OtherClassA_4_0(feature) {
+            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 23.236164 ) {
+                return {
+                pane: 'pane_OtherClassA_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 45.777989 ) {
+                return {
+                pane: 'pane_OtherClassA_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 45.777989 && feature.properties['Cannabis Perc.'] <= 63.899139 ) {
+                return {
+                pane: 'pane_OtherClassA_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 63.899139 && feature.properties['Cannabis Perc.'] <= 71.752165 ) {
+                return {
+                pane: 'pane_OtherClassA_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 71.752165 && feature.properties['Cannabis Perc.'] <= 82.418813 ) {
+                return {
+                pane: 'pane_OtherClassA_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_OtherClassA_4');
+        map.getPane('pane_OtherClassA_4').style.zIndex = 404;
+        map.getPane('pane_OtherClassA_4').style['mix-blend-mode'] = 'normal';
+        var layer_OtherClassA_4 = new L.geoJson(json_OtherClassA_4, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_OtherClassA_4',
+            layerName: 'layer_OtherClassA_4',
+            pane: 'pane_OtherClassA_4',
+            onEachFeature: pop_OtherClassA_4,
+            style: style_OtherClassA_4_0,
+        });
+        bounds_group.addLayer(layer_OtherClassA_4);
+        function pop_NitrousOxide_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nitrous Oxide Perc.'] !== null ? autolinker.link(feature.properties['Nitrous Oxide Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_NitrousOxide_5_0(feature) {
+            if (feature.properties['Nitrous Oxide Perc.'] >= 0.000000 && feature.properties['Nitrous Oxide Perc.'] <= 0.486787 ) {
+                return {
+                pane: 'pane_NitrousOxide_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Nitrous Oxide Perc.'] >= 0.486787 && feature.properties['Nitrous Oxide Perc.'] <= 1.149288 ) {
+                return {
+                pane: 'pane_NitrousOxide_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Nitrous Oxide Perc.'] >= 1.149288 && feature.properties['Nitrous Oxide Perc.'] <= 1.749210 ) {
+                return {
+                pane: 'pane_NitrousOxide_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Nitrous Oxide Perc.'] >= 1.749210 && feature.properties['Nitrous Oxide Perc.'] <= 2.476415 ) {
+                return {
+                pane: 'pane_NitrousOxide_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Nitrous Oxide Perc.'] >= 2.476415 && feature.properties['Nitrous Oxide Perc.'] <= 4.551974 ) {
+                return {
+                pane: 'pane_NitrousOxide_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_NitrousOxide_5');
+        map.getPane('pane_NitrousOxide_5').style.zIndex = 405;
+        map.getPane('pane_NitrousOxide_5').style['mix-blend-mode'] = 'normal';
+        var layer_NitrousOxide_5 = new L.geoJson(json_NitrousOxide_5, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_NitrousOxide_5',
+            layerName: 'layer_NitrousOxide_5',
+            pane: 'pane_NitrousOxide_5',
+            onEachFeature: pop_NitrousOxide_5,
+            style: style_NitrousOxide_5_0,
+        });
+        bounds_group.addLayer(layer_NitrousOxide_5);
+        function pop_Morphine_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Morphine Perc.'] !== null ? autolinker.link(feature.properties['Morphine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Morphine_6_0(feature) {
+            if (feature.properties['Morphine Perc.'] >= 0.000000 && feature.properties['Morphine Perc.'] <= 0.055991 ) {
+                return {
+                pane: 'pane_Morphine_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Morphine Perc.'] >= 0.055991 && feature.properties['Morphine Perc.'] <= 0.165563 ) {
+                return {
+                pane: 'pane_Morphine_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Morphine Perc.'] >= 0.165563 && feature.properties['Morphine Perc.'] <= 0.244282 ) {
+                return {
+                pane: 'pane_Morphine_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Morphine Perc.'] >= 0.244282 && feature.properties['Morphine Perc.'] <= 0.433735 ) {
+                return {
+                pane: 'pane_Morphine_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Morphine Perc.'] >= 0.433735 && feature.properties['Morphine Perc.'] <= 0.616698 ) {
+                return {
+                pane: 'pane_Morphine_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Morphine_6');
+        map.getPane('pane_Morphine_6').style.zIndex = 406;
+        map.getPane('pane_Morphine_6').style['mix-blend-mode'] = 'normal';
+        var layer_Morphine_6 = new L.geoJson(json_Morphine_6, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Morphine_6',
+            layerName: 'layer_Morphine_6',
+            pane: 'pane_Morphine_6',
+            onEachFeature: pop_Morphine_6,
+            style: style_Morphine_6_0,
+        });
+        bounds_group.addLayer(layer_Morphine_6);
+        function pop_Amphetemines_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Amphetamines Perc.'] !== null ? autolinker.link(feature.properties['Amphetamines Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Amphetemines_7_0(feature) {
+            if (feature.properties['Amphetamines Perc.'] >= 0.052868 && feature.properties['Amphetamines Perc.'] <= 0.662252 ) {
+                return {
+                pane: 'pane_Amphetemines_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Amphetamines Perc.'] >= 0.662252 && feature.properties['Amphetamines Perc.'] <= 1.376751 ) {
+                return {
+                pane: 'pane_Amphetemines_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Amphetamines Perc.'] >= 1.376751 && feature.properties['Amphetamines Perc.'] <= 2.336607 ) {
+                return {
+                pane: 'pane_Amphetemines_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Amphetamines Perc.'] >= 2.336607 && feature.properties['Amphetamines Perc.'] <= 4.396024 ) {
+                return {
+                pane: 'pane_Amphetemines_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Amphetamines Perc.'] >= 4.396024 && feature.properties['Amphetamines Perc.'] <= 6.328125 ) {
+                return {
+                pane: 'pane_Amphetemines_7',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Amphetemines_7');
+        map.getPane('pane_Amphetemines_7').style.zIndex = 407;
+        map.getPane('pane_Amphetemines_7').style['mix-blend-mode'] = 'normal';
+        var layer_Amphetemines_7 = new L.geoJson(json_Amphetemines_7, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Amphetemines_7',
+            layerName: 'layer_Amphetemines_7',
+            pane: 'pane_Amphetemines_7',
+            onEachFeature: pop_Amphetemines_7,
+            style: style_Amphetemines_7_0,
+        });
+        bounds_group.addLayer(layer_Amphetemines_7);
+        function pop_LSD_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LSD Perc.'] !== null ? autolinker.link(feature.properties['LSD Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_LSD_8_0(feature) {
+            if (feature.properties['LSD Perc.'] >= 0.000000 && feature.properties['LSD Perc.'] <= 0.019798 ) {
+                return {
+                pane: 'pane_LSD_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['LSD Perc.'] >= 0.019798 && feature.properties['LSD Perc.'] <= 0.097593 ) {
+                return {
+                pane: 'pane_LSD_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['LSD Perc.'] >= 0.097593 && feature.properties['LSD Perc.'] <= 0.184502 ) {
+                return {
+                pane: 'pane_LSD_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['LSD Perc.'] >= 0.184502 && feature.properties['LSD Perc.'] <= 0.308642 ) {
+                return {
+                pane: 'pane_LSD_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['LSD Perc.'] >= 0.308642 && feature.properties['LSD Perc.'] <= 0.442122 ) {
+                return {
+                pane: 'pane_LSD_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_LSD_8');
+        map.getPane('pane_LSD_8').style.zIndex = 408;
+        map.getPane('pane_LSD_8').style['mix-blend-mode'] = 'normal';
+        var layer_LSD_8 = new L.geoJson(json_LSD_8, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_LSD_8',
+            layerName: 'layer_LSD_8',
+            pane: 'pane_LSD_8',
+            onEachFeature: pop_LSD_8,
+            style: style_LSD_8_0,
+        });
+        bounds_group.addLayer(layer_LSD_8);
+        function pop_Ketamine_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ketamine Perc.'] !== null ? autolinker.link(feature.properties['Ketamine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Ketamine_9_0(feature) {
+            if (feature.properties['Ketamine Perc.'] >= 0.069541 && feature.properties['Ketamine Perc.'] <= 0.759013 ) {
+                return {
+                pane: 'pane_Ketamine_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ketamine Perc.'] >= 0.759013 && feature.properties['Ketamine Perc.'] <= 1.626579 ) {
+                return {
+                pane: 'pane_Ketamine_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ketamine Perc.'] >= 1.626579 && feature.properties['Ketamine Perc.'] <= 2.829028 ) {
+                return {
+                pane: 'pane_Ketamine_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ketamine Perc.'] >= 2.829028 && feature.properties['Ketamine Perc.'] <= 3.995936 ) {
+                return {
+                pane: 'pane_Ketamine_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ketamine Perc.'] >= 3.995936 && feature.properties['Ketamine Perc.'] <= 4.927007 ) {
+                return {
+                pane: 'pane_Ketamine_9',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Ketamine_9');
+        map.getPane('pane_Ketamine_9').style.zIndex = 409;
+        map.getPane('pane_Ketamine_9').style['mix-blend-mode'] = 'normal';
+        var layer_Ketamine_9 = new L.geoJson(json_Ketamine_9, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Ketamine_9',
+            layerName: 'layer_Ketamine_9',
+            pane: 'pane_Ketamine_9',
+            onEachFeature: pop_Ketamine_9,
+            style: style_Ketamine_9_0,
+        });
+        bounds_group.addLayer(layer_Ketamine_9);
+        function pop_Heroin_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Heroin Perc.'] !== null ? autolinker.link(feature.properties['Heroin Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Heroin_10_0(feature) {
+            if (feature.properties['Heroin Perc.'] >= 0.514403 && feature.properties['Heroin Perc.'] <= 1.668985 ) {
+                return {
+                pane: 'pane_Heroin_10',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Heroin Perc.'] >= 1.668985 && feature.properties['Heroin Perc.'] <= 3.245522 ) {
+                return {
+                pane: 'pane_Heroin_10',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Heroin Perc.'] >= 3.245522 && feature.properties['Heroin Perc.'] <= 4.960000 ) {
+                return {
+                pane: 'pane_Heroin_10',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Heroin Perc.'] >= 4.960000 && feature.properties['Heroin Perc.'] <= 7.454128 ) {
+                return {
+                pane: 'pane_Heroin_10',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Heroin Perc.'] >= 7.454128 && feature.properties['Heroin Perc.'] <= 13.182674 ) {
+                return {
+                pane: 'pane_Heroin_10',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Heroin_10');
+        map.getPane('pane_Heroin_10').style.zIndex = 410;
+        map.getPane('pane_Heroin_10').style['mix-blend-mode'] = 'normal';
+        var layer_Heroin_10 = new L.geoJson(json_Heroin_10, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Heroin_10',
+            layerName: 'layer_Heroin_10',
+            pane: 'pane_Heroin_10',
+            onEachFeature: pop_Heroin_10,
+            style: style_Heroin_10_0,
+        });
+        bounds_group.addLayer(layer_Heroin_10);
+        function pop_GHB_11(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['GHB Perc.'] !== null ? autolinker.link(feature.properties['GHB Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_GHB_11_0(feature) {
+            if (feature.properties['GHB Perc.'] >= 0.000000 && feature.properties['GHB Perc.'] <= 0.000000 ) {
+                return {
+                pane: 'pane_GHB_11',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['GHB Perc.'] >= 0.000000 && feature.properties['GHB Perc.'] <= 0.031612 ) {
+                return {
+                pane: 'pane_GHB_11',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['GHB Perc.'] >= 0.031612 && feature.properties['GHB Perc.'] <= 0.103247 ) {
+                return {
+                pane: 'pane_GHB_11',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['GHB Perc.'] >= 0.103247 && feature.properties['GHB Perc.'] <= 0.259560 ) {
+                return {
+                pane: 'pane_GHB_11',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['GHB Perc.'] >= 0.259560 && feature.properties['GHB Perc.'] <= 0.353774 ) {
+                return {
+                pane: 'pane_GHB_11',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_GHB_11');
+        map.getPane('pane_GHB_11').style.zIndex = 411;
+        map.getPane('pane_GHB_11').style['mix-blend-mode'] = 'normal';
+        var layer_GHB_11 = new L.geoJson(json_GHB_11, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_GHB_11',
+            layerName: 'layer_GHB_11',
+            pane: 'pane_GHB_11',
+            onEachFeature: pop_GHB_11,
+            style: style_GHB_11_0,
+        });
+        bounds_group.addLayer(layer_GHB_11);
+        function pop_Ecstasy_12(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ecstasy Perc.'] !== null ? autolinker.link(feature.properties['Ecstasy Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Ecstasy_12_0(feature) {
+            if (feature.properties['Ecstasy Perc.'] >= 0.152749 && feature.properties['Ecstasy Perc.'] <= 0.260247 ) {
+                return {
+                pane: 'pane_Ecstasy_12',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ecstasy Perc.'] >= 0.260247 && feature.properties['Ecstasy Perc.'] <= 0.741504 ) {
+                return {
+                pane: 'pane_Ecstasy_12',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ecstasy Perc.'] >= 0.741504 && feature.properties['Ecstasy Perc.'] <= 1.280000 ) {
+                return {
+                pane: 'pane_Ecstasy_12',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ecstasy Perc.'] >= 1.280000 && feature.properties['Ecstasy Perc.'] <= 3.376206 ) {
+                return {
+                pane: 'pane_Ecstasy_12',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Ecstasy Perc.'] >= 3.376206 && feature.properties['Ecstasy Perc.'] <= 4.593640 ) {
+                return {
+                pane: 'pane_Ecstasy_12',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Ecstasy_12');
+        map.getPane('pane_Ecstasy_12').style.zIndex = 412;
+        map.getPane('pane_Ecstasy_12').style['mix-blend-mode'] = 'normal';
+        var layer_Ecstasy_12 = new L.geoJson(json_Ecstasy_12, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Ecstasy_12',
+            layerName: 'layer_Ecstasy_12',
+            pane: 'pane_Ecstasy_12',
+            onEachFeature: pop_Ecstasy_12,
+            style: style_Ecstasy_12_0,
+        });
+        bounds_group.addLayer(layer_Ecstasy_12);
+        function pop_Crack_13(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Crack Perc.'] !== null ? autolinker.link(feature.properties['Crack Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Crack_13_0(feature) {
+            if (feature.properties['Crack Perc.'] >= 0.494951 && feature.properties['Crack Perc.'] <= 1.791713 ) {
+                return {
+                pane: 'pane_Crack_13',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Crack Perc.'] >= 1.791713 && feature.properties['Crack Perc.'] <= 3.741054 ) {
+                return {
+                pane: 'pane_Crack_13',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Crack Perc.'] >= 3.741054 && feature.properties['Crack Perc.'] <= 5.554788 ) {
+                return {
+                pane: 'pane_Crack_13',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Crack Perc.'] >= 5.554788 && feature.properties['Crack Perc.'] <= 9.879518 ) {
+                return {
+                pane: 'pane_Crack_13',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Crack Perc.'] >= 9.879518 && feature.properties['Crack Perc.'] <= 15.442561 ) {
+                return {
+                pane: 'pane_Crack_13',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Crack_13');
+        map.getPane('pane_Crack_13').style.zIndex = 413;
+        map.getPane('pane_Crack_13').style['mix-blend-mode'] = 'normal';
+        var layer_Crack_13 = new L.geoJson(json_Crack_13, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Crack_13',
+            layerName: 'layer_Crack_13',
+            pane: 'pane_Crack_13',
+            onEachFeature: pop_Crack_13,
+            style: style_Crack_13_0,
+        });
+        bounds_group.addLayer(layer_Crack_13);
+        function pop_Cocaine_14(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Cocaine Perc.'] !== null ? autolinker.link(feature.properties['Cocaine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cocaine_14_0(feature) {
+            if (feature.properties['Cocaine Perc.'] >= 2.058998 && feature.properties['Cocaine Perc.'] <= 5.921227 ) {
+                return {
+                pane: 'pane_Cocaine_14',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cocaine Perc.'] >= 5.921227 && feature.properties['Cocaine Perc.'] <= 13.211160 ) {
+                return {
+                pane: 'pane_Cocaine_14',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cocaine Perc.'] >= 13.211160 && feature.properties['Cocaine Perc.'] <= 18.760582 ) {
+                return {
+                pane: 'pane_Cocaine_14',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cocaine Perc.'] >= 18.760582 && feature.properties['Cocaine Perc.'] <= 23.820755 ) {
+                return {
+                pane: 'pane_Cocaine_14',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cocaine Perc.'] >= 23.820755 && feature.properties['Cocaine Perc.'] <= 32.626620 ) {
+                return {
+                pane: 'pane_Cocaine_14',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Cocaine_14');
+        map.getPane('pane_Cocaine_14').style.zIndex = 414;
+        map.getPane('pane_Cocaine_14').style['mix-blend-mode'] = 'normal';
+        var layer_Cocaine_14 = new L.geoJson(json_Cocaine_14, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Cocaine_14',
+            layerName: 'layer_Cocaine_14',
+            pane: 'pane_Cocaine_14',
+            onEachFeature: pop_Cocaine_14,
+            style: style_Cocaine_14_0,
+        });
+        bounds_group.addLayer(layer_Cocaine_14);
+        function pop_Cannabis_15(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">fid</th>\
+                        <td>' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Police force region or authority</th>\
+                        <td>' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cannabis Perc.</th>\
+                        <td>' + (feature.properties['Cannabis Perc.'] !== null ? autolinker.link(feature.properties['Cannabis Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cannabis_15_0(feature) {
+            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 23.236164 ) {
+                return {
+                pane: 'pane_Cannabis_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 45.777989 ) {
+                return {
+                pane: 'pane_Cannabis_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,191,191,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 45.777989 && feature.properties['Cannabis Perc.'] <= 63.899139 ) {
+                return {
+                pane: 'pane_Cannabis_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,128,128,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 63.899139 && feature.properties['Cannabis Perc.'] <= 71.752165 ) {
+                return {
+                pane: 'pane_Cannabis_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,64,64,1.0)',
+                interactive: false,
+            }
+            }
+            if (feature.properties['Cannabis Perc.'] >= 71.752165 && feature.properties['Cannabis Perc.'] <= 82.418813 ) {
+                return {
+                pane: 'pane_Cannabis_15',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: false,
+            }
+            }
+        }
+        map.createPane('pane_Cannabis_15');
+        map.getPane('pane_Cannabis_15').style.zIndex = 415;
+        map.getPane('pane_Cannabis_15').style['mix-blend-mode'] = 'normal';
+        var layer_Cannabis_15 = new L.geoJson(json_Cannabis_15, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Cannabis_15',
+            layerName: 'layer_Cannabis_15',
+            pane: 'pane_Cannabis_15',
+            onEachFeature: pop_Cannabis_15,
+            style: style_Cannabis_15_0,
+        });
+        bounds_group.addLayer(layer_Cannabis_15);
+        map.addLayer(layer_Cannabis_15);
+        function pop_Secondmostcommondrug_16(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(feature.properties['fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Police force region or authority'] !== null ? autolinker.link(feature.properties['Police force region or authority'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Cocaine Perc.'] !== null ? autolinker.link(feature.properties['Cocaine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Crack Perc.'] !== null ? autolinker.link(feature.properties['Crack Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ecstasy Perc.'] !== null ? autolinker.link(feature.properties['Ecstasy Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Heroin Perc.'] !== null ? autolinker.link(feature.properties['Heroin Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LSD Perc.'] !== null ? autolinker.link(feature.properties['LSD Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Methadone Perc.'] !== null ? autolinker.link(feature.properties['Methadone Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Morphine Perc.'] !== null ? autolinker.link(feature.properties['Morphine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Cannabis Perc.'] !== null ? autolinker.link(feature.properties['Cannabis Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Amphetamines Perc.'] !== null ? autolinker.link(feature.properties['Amphetamines Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Barbiturates Perc.'] !== null ? autolinker.link(feature.properties['Barbiturates Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ketamine Perc.'] !== null ? autolinker.link(feature.properties['Ketamine Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Mephedrone Perc.'] !== null ? autolinker.link(feature.properties['Mephedrone Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['GHB Perc.'] !== null ? autolinker.link(feature.properties['GHB Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Anabolic Perc.'] !== null ? autolinker.link(feature.properties['Anabolic Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Benzodiazepines Perc.'] !== null ? autolinker.link(feature.properties['Benzodiazepines Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Nitrous Oxide Perc.'] !== null ? autolinker.link(feature.properties['Nitrous Oxide Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Temazepam Perc.'] !== null ? autolinker.link(feature.properties['Temazepam Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Class B Perc.'] !== null ? autolinker.link(feature.properties['Other Class B Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Class C Perc.'] !== null ? autolinker.link(feature.properties['Other Class C Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Other Class A Perc.'] !== null ? autolinker.link(feature.properties['Other Class A Perc.'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number One'] !== null ? autolinker.link(feature.properties['Number One'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Number Two'] !== null ? autolinker.link(feature.properties['Number Two'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Secondmostcommondrug_16_0(feature) {
+            switch(String(feature.properties['Number Two'])) {
+                case 'Cocaine ':
+                    return {
+                pane: 'pane_Secondmostcommondrug_16',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(148,224,100,1.0)',
+                interactive: false,
+            }
+                    break;
+                case 'Crack ':
+                    return {
+                pane: 'pane_Secondmostcommondrug_16',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(81,137,227,1.0)',
+                interactive: false,
+            }
+                    break;
+                case 'Morphine ':
+                    return {
+                pane: 'pane_Secondmostcommondrug_16',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(211,75,130,1.0)',
+                interactive: false,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Secondmostcommondrug_16');
+        map.getPane('pane_Secondmostcommondrug_16').style.zIndex = 416;
+        map.getPane('pane_Secondmostcommondrug_16').style['mix-blend-mode'] = 'normal';
+        var layer_Secondmostcommondrug_16 = new L.geoJson(json_Secondmostcommondrug_16, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_Secondmostcommondrug_16',
+            layerName: 'layer_Secondmostcommondrug_16',
+            pane: 'pane_Secondmostcommondrug_16',
+            onEachFeature: pop_Secondmostcommondrug_16,
+            style: style_Secondmostcommondrug_16_0,
+        });
+        bounds_group.addLayer(layer_Secondmostcommondrug_16);
+        map.addLayer(layer_Secondmostcommondrug_16);
+        var overlaysTree = [
+            {label: 'Second most common drug<br /><table><tr><td style="text-align: center;"><img src="legend/Secondmostcommondrug_16_Cocaine0.png" /></td><td>Cocaine </td></tr><tr><td style="text-align: center;"><img src="legend/Secondmostcommondrug_16_Crack1.png" /></td><td>Crack </td></tr><tr><td style="text-align: center;"><img src="legend/Secondmostcommondrug_16_Morphine2.png" /></td><td>Morphine </td></tr></table>', layer: layer_Secondmostcommondrug_16},
+        {label: '<b>Drugs by Percentage</b>', selectAllCheckbox: true, children: [
+            {label: 'Cannabis<br /><table><tr><td style="text-align: center;"><img src="legend/Cannabis_15_2322320.png" /></td><td>23.2 - 23.2</td></tr><tr><td style="text-align: center;"><img src="legend/Cannabis_15_2324581.png" /></td><td>23.2 - 45.8</td></tr><tr><td style="text-align: center;"><img src="legend/Cannabis_15_4586392.png" /></td><td>45.8 - 63.9</td></tr><tr><td style="text-align: center;"><img src="legend/Cannabis_15_6397183.png" /></td><td>63.9 - 71.8</td></tr><tr><td style="text-align: center;"><img src="legend/Cannabis_15_7188244.png" /></td><td>71.8 - 82.4</td></tr></table>', layer: layer_Cannabis_15},
+            {label: 'Cocaine<br /><table><tr><td style="text-align: center;"><img src="legend/Cocaine_14_21590.png" /></td><td>2.1 - 5.9</td></tr><tr><td style="text-align: center;"><img src="legend/Cocaine_14_591321.png" /></td><td>5.9 - 13.2</td></tr><tr><td style="text-align: center;"><img src="legend/Cocaine_14_1321882.png" /></td><td>13.2 - 18.8</td></tr><tr><td style="text-align: center;"><img src="legend/Cocaine_14_1882383.png" /></td><td>18.8 - 23.8</td></tr><tr><td style="text-align: center;"><img src="legend/Cocaine_14_2383264.png" /></td><td>23.8 - 32.6</td></tr></table>', layer: layer_Cocaine_14},
+            {label: 'Crack<br /><table><tr><td style="text-align: center;"><img src="legend/Crack_13_05180.png" /></td><td>0.5 - 1.8</td></tr><tr><td style="text-align: center;"><img src="legend/Crack_13_18371.png" /></td><td>1.8 - 3.7</td></tr><tr><td style="text-align: center;"><img src="legend/Crack_13_37562.png" /></td><td>3.7 - 5.6</td></tr><tr><td style="text-align: center;"><img src="legend/Crack_13_56993.png" /></td><td>5.6 - 9.9</td></tr><tr><td style="text-align: center;"><img src="legend/Crack_13_991544.png" /></td><td>9.9 - 15.4</td></tr></table>', layer: layer_Crack_13},
+            {label: 'Ecstasy<br /><table><tr><td style="text-align: center;"><img src="legend/Ecstasy_12_0150260.png" /></td><td>0.15 - 0.26</td></tr><tr><td style="text-align: center;"><img src="legend/Ecstasy_12_0260741.png" /></td><td>0.26 - 0.74</td></tr><tr><td style="text-align: center;"><img src="legend/Ecstasy_12_0741282.png" /></td><td>0.74 - 1.28</td></tr><tr><td style="text-align: center;"><img src="legend/Ecstasy_12_1283383.png" /></td><td>1.28 - 3.38</td></tr><tr><td style="text-align: center;"><img src="legend/Ecstasy_12_3384594.png" /></td><td>3.38 - 4.59</td></tr></table>', layer: layer_Ecstasy_12},
+            {label: 'GHB<br /><table><tr><td style="text-align: center;"><img src="legend/GHB_11_000.png" /></td><td>0 - 0</td></tr><tr><td style="text-align: center;"><img src="legend/GHB_11_000321.png" /></td><td>0 - 0.032</td></tr><tr><td style="text-align: center;"><img src="legend/GHB_11_003201032.png" /></td><td>0.032 - 0.103</td></tr><tr><td style="text-align: center;"><img src="legend/GHB_11_01030263.png" /></td><td>0.103 - 0.26</td></tr><tr><td style="text-align: center;"><img src="legend/GHB_11_02603544.png" /></td><td>0.26 - 0.354</td></tr></table>', layer: layer_GHB_11},
+            {label: 'Heroin<br /><table><tr><td style="text-align: center;"><img src="legend/Heroin_10_05170.png" /></td><td>0.5 - 1.7</td></tr><tr><td style="text-align: center;"><img src="legend/Heroin_10_17321.png" /></td><td>1.7 - 3.2</td></tr><tr><td style="text-align: center;"><img src="legend/Heroin_10_3252.png" /></td><td>3.2 - 5</td></tr><tr><td style="text-align: center;"><img src="legend/Heroin_10_5753.png" /></td><td>5 - 7.5</td></tr><tr><td style="text-align: center;"><img src="legend/Heroin_10_751324.png" /></td><td>7.5 - 13.2</td></tr></table>', layer: layer_Heroin_10},
+            {label: 'Ketamine<br /><table><tr><td style="text-align: center;"><img src="legend/Ketamine_9_0070760.png" /></td><td>0.07 - 0.76</td></tr><tr><td style="text-align: center;"><img src="legend/Ketamine_9_0761631.png" /></td><td>0.76 - 1.63</td></tr><tr><td style="text-align: center;"><img src="legend/Ketamine_9_1632832.png" /></td><td>1.63 - 2.83</td></tr><tr><td style="text-align: center;"><img src="legend/Ketamine_9_28343.png" /></td><td>2.83 - 4</td></tr><tr><td style="text-align: center;"><img src="legend/Ketamine_9_44934.png" /></td><td>4 - 4.93</td></tr></table>', layer: layer_Ketamine_9},
+            {label: 'LSD<br /><table><tr><td style="text-align: center;"><img src="legend/LSD_8_00020.png" /></td><td>0 - 0.02</td></tr><tr><td style="text-align: center;"><img src="legend/LSD_8_00200981.png" /></td><td>0.02 - 0.098</td></tr><tr><td style="text-align: center;"><img src="legend/LSD_8_009801852.png" /></td><td>0.098 - 0.185</td></tr><tr><td style="text-align: center;"><img src="legend/LSD_8_018503093.png" /></td><td>0.185 - 0.309</td></tr><tr><td style="text-align: center;"><img src="legend/LSD_8_030904424.png" /></td><td>0.309 - 0.442</td></tr></table>', layer: layer_LSD_8},
+            {label: 'Amphetemines<br /><table><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_0050660.png" /></td><td>0.05 - 0.66</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_0661381.png" /></td><td>0.66 - 1.38</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_1382342.png" /></td><td>1.38 - 2.34</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_234443.png" /></td><td>2.34 - 4.4</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_446334.png" /></td><td>4.4 - 6.33</td></tr></table>', layer: layer_Amphetemines_7},
+            {label: 'Morphine<br /><table><tr><td style="text-align: center;"><img src="legend/Morphine_6_000560.png" /></td><td>0 - 0.056</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_005601661.png" /></td><td>0.056 - 0.166</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_016602442.png" /></td><td>0.166 - 0.244</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_024404343.png" /></td><td>0.244 - 0.434</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_043406174.png" /></td><td>0.434 - 0.617</td></tr></table>', layer: layer_Morphine_6},
+            {label: 'Nitrous Oxide<br /><table><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_00490.png" /></td><td>0 - 0.49</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_0491151.png" /></td><td>0.49 - 1.15</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_1151752.png" /></td><td>1.15 - 1.75</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_1752483.png" /></td><td>1.75 - 2.48</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_2484554.png" /></td><td>2.48 - 4.55</td></tr></table>', layer: layer_NitrousOxide_5},
+            {label: 'Other Class A<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_2322320.png" /></td><td>23.2 - 23.2</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_2324581.png" /></td><td>23.2 - 45.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_4586392.png" /></td><td>45.8 - 63.9</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_6397183.png" /></td><td>63.9 - 71.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_7188244.png" /></td><td>71.8 - 82.4</td></tr></table>', layer: layer_OtherClassA_4},
+            {label: 'Other Class B<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_2322320.png" /></td><td>23.2 - 23.2</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_2324581.png" /></td><td>23.2 - 45.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_4586392.png" /></td><td>45.8 - 63.9</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_6397183.png" /></td><td>63.9 - 71.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_7188244.png" /></td><td>71.8 - 82.4</td></tr></table>', layer: layer_OtherClassB_3},
+            {label: 'Other Class C<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_00450.png" /></td><td>0 - 0.45</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_0451221.png" /></td><td>0.45 - 1.22</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_1222622.png" /></td><td>1.22 - 2.62</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_2626043.png" /></td><td>2.62 - 6.04</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_60411364.png" /></td><td>6.04 - 11.36</td></tr></table>', layer: layer_OtherClassC_2},]},
+            {label: '<img src="legend/Information_1.png" /> Information', layer: layer_Information_1},
+            {label: " ", layer: layer__0, radioGroup: 'bm' },]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        resetLabels([layer_OtherClassC_2,layer_OtherClassB_3,layer_OtherClassA_4,layer_NitrousOxide_5,layer_Morphine_6,layer_Amphetemines_7,layer_LSD_8,layer_Ketamine_9,layer_Heroin_10,layer_GHB_11,layer_Ecstasy_12,layer_Crack_13,layer_Cocaine_14,layer_Cannabis_15,layer_Secondmostcommondrug_16]);
+        map.on("zoomend", function(){
+            resetLabels([layer_OtherClassC_2,layer_OtherClassB_3,layer_OtherClassA_4,layer_NitrousOxide_5,layer_Morphine_6,layer_Amphetemines_7,layer_LSD_8,layer_Ketamine_9,layer_Heroin_10,layer_GHB_11,layer_Ecstasy_12,layer_Crack_13,layer_Cocaine_14,layer_Cannabis_15,layer_Secondmostcommondrug_16]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_OtherClassC_2,layer_OtherClassB_3,layer_OtherClassA_4,layer_NitrousOxide_5,layer_Morphine_6,layer_Amphetemines_7,layer_LSD_8,layer_Ketamine_9,layer_Heroin_10,layer_GHB_11,layer_Ecstasy_12,layer_Crack_13,layer_Cocaine_14,layer_Cannabis_15,layer_Secondmostcommondrug_16]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_OtherClassC_2,layer_OtherClassB_3,layer_OtherClassA_4,layer_NitrousOxide_5,layer_Morphine_6,layer_Amphetemines_7,layer_LSD_8,layer_Ketamine_9,layer_Heroin_10,layer_GHB_11,layer_Ecstasy_12,layer_Crack_13,layer_Cocaine_14,layer_Cannabis_15,layer_Secondmostcommondrug_16]);
+        });
+        </script>
+    </body>
+</html>
