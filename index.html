@@ -12,13 +12,13 @@
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <style>
         #map {
-            width: 573px;
+            width: 594px;
             height: 739px;
         }
         </style>
         <title></title>
     </head>
-     <h1 style="font-family:Arial">UK Illegal Drug Atlas</h1>
+    <h1 style="font-family:Arial">UK Illegal Drug Atlas</h1>
 	<p style="font-family:Arial">The value for each drug is the number of times it was seized out of the total number of seisures, as a percentage.</p>
 	<p style="font-family:Arial">Click on an area to view detailed statistics.</p>
     <body>
@@ -53,7 +53,7 @@
         <script>
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
-        }).fitBounds([[42.997498567592686,-8.859993318014299],[57.25067460597271,10.710451833274291]]);
+        })
         var hash = new L.Hash(map);
         map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
         var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -90,111 +90,85 @@
         }).addTo(map);
         var bounds_group = new L.featureGroup([]);
         function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
         }
-        map.createPane('pane__0');
-        map.getPane('pane__0').style.zIndex = 400;
-        var layer__0 = L.tileLayer('https://cartocdn_a.global.ssl.fastly.net/base-eco/{z}/{x}/{y}.png', {
-            pane: 'pane__0',
+        map.createPane('pane_Basemap_0');
+        map.getPane('pane_Basemap_0').style.zIndex = 400;
+        var layer_Basemap_0 = L.tileLayer('https://cartocdn_a.global.ssl.fastly.net/base-eco/{z}/{x}/{y}.png', {
+            pane: 'pane_Basemap_0',
             opacity: 1.0,
             attribution: '',
             minZoom: 1,
             maxZoom: 28,
         });
-        layer__0;
-        map.addLayer(layer__0);
+        layer_Basemap_0;
+        map.addLayer(layer_Basemap_0);
         function pop_Information_1(feature, layer) {
             var popupContent = '<table>\
                     <tr>\
-                        <th scope="row">Police Area</th>\
-                        <td>' + (feature.properties['Police Area'] !== null ? autolinker.link(feature.properties['Police Area'].toLocaleString()) : '') + '</td>\
+                        <td colspan="2">' + (feature.properties['Police Area'] !== null ? autolinker.link(feature.properties['Police Area'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Cocaine Perc.</th>\
-                        <td>' + (feature.properties['Cocaine Perc.'] !== null ? autolinker.link(feature.properties['Cocaine Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Cocaine</th>\
+                        <td>' + (feature.properties['Cocaine'] !== null ? autolinker.link(feature.properties['Cocaine'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Crack Perc.</th>\
-                        <td>' + (feature.properties['Crack Perc.'] !== null ? autolinker.link(feature.properties['Crack Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Crack</th>\
+                        <td>' + (feature.properties['Crack'] !== null ? autolinker.link(feature.properties['Crack'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Ecstasy Perc.</th>\
-                        <td>' + (feature.properties['Ecstasy Perc.'] !== null ? autolinker.link(feature.properties['Ecstasy Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Ecstasy</th>\
+                        <td>' + (feature.properties['Ecstasy'] !== null ? autolinker.link(feature.properties['Ecstasy'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Heroin Perc.</th>\
-                        <td>' + (feature.properties['Heroin Perc.'] !== null ? autolinker.link(feature.properties['Heroin Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Heroin</th>\
+                        <td>' + (feature.properties['Heroin'] !== null ? autolinker.link(feature.properties['Heroin'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">LSD Perc.</th>\
-                        <td>' + (feature.properties['LSD Perc.'] !== null ? autolinker.link(feature.properties['LSD Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">LSD</th>\
+                        <td>' + (feature.properties['LSD'] !== null ? autolinker.link(feature.properties['LSD'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Methadone Perc.</th>\
-                        <td>' + (feature.properties['Methadone Perc.'] !== null ? autolinker.link(feature.properties['Methadone Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Morphine</th>\
+                        <td>' + (feature.properties['Morphine'] !== null ? autolinker.link(feature.properties['Morphine'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Morphine Perc.</th>\
-                        <td>' + (feature.properties['Morphine Perc.'] !== null ? autolinker.link(feature.properties['Morphine Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Cannabis</th>\
+                        <td>' + (feature.properties['Cannabis'] !== null ? autolinker.link(feature.properties['Cannabis'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Cannabis Perc.</th>\
-                        <td>' + (feature.properties['Cannabis Perc.'] !== null ? autolinker.link(feature.properties['Cannabis Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Amphetamines</th>\
+                        <td>' + (feature.properties['Amphetamines'] !== null ? autolinker.link(feature.properties['Amphetamines'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Amphetamines Perc.</th>\
-                        <td>' + (feature.properties['Amphetamines Perc.'] !== null ? autolinker.link(feature.properties['Amphetamines Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Ketamine</th>\
+                        <td>' + (feature.properties['Ketamine'] !== null ? autolinker.link(feature.properties['Ketamine'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Barbiturates Perc.</th>\
-                        <td>' + (feature.properties['Barbiturates Perc.'] !== null ? autolinker.link(feature.properties['Barbiturates Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">GHB</th>\
+                        <td>' + (feature.properties['GHB'] !== null ? autolinker.link(feature.properties['GHB'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Ketamine Perc.</th>\
-                        <td>' + (feature.properties['Ketamine Perc.'] !== null ? autolinker.link(feature.properties['Ketamine Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Anabolic Steroids</th>\
+                        <td>' + (feature.properties['Anabolic Steroids'] !== null ? autolinker.link(feature.properties['Anabolic Steroids'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Mephedrone Perc.</th>\
-                        <td>' + (feature.properties['Mephedrone Perc.'] !== null ? autolinker.link(feature.properties['Mephedrone Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Nitrous Oxide</th>\
+                        <td>' + (feature.properties['Nitrous Oxide'] !== null ? autolinker.link(feature.properties['Nitrous Oxide'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">GHB Perc.</th>\
-                        <td>' + (feature.properties['GHB Perc.'] !== null ? autolinker.link(feature.properties['GHB Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Other Class B</th>\
+                        <td>' + (feature.properties['Other Class B'] !== null ? autolinker.link(feature.properties['Other Class B'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Anabolic Perc.</th>\
-                        <td>' + (feature.properties['Anabolic Perc.'] !== null ? autolinker.link(feature.properties['Anabolic Perc.'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Other Class C</th>\
+                        <td>' + (feature.properties['Other Class C'] !== null ? autolinker.link(feature.properties['Other Class C'].toLocaleString()) : '') + '</td>\
                     </tr>\
                     <tr>\
-                        <th scope="row">Benzodiazepines Perc.</th>\
-                        <td>' + (feature.properties['Benzodiazepines Perc.'] !== null ? autolinker.link(feature.properties['Benzodiazepines Perc.'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Nitrous Oxide Perc.</th>\
-                        <td>' + (feature.properties['Nitrous Oxide Perc.'] !== null ? autolinker.link(feature.properties['Nitrous Oxide Perc.'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Temazepam Perc.</th>\
-                        <td>' + (feature.properties['Temazepam Perc.'] !== null ? autolinker.link(feature.properties['Temazepam Perc.'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Other Class B Perc.</th>\
-                        <td>' + (feature.properties['Other Class B Perc.'] !== null ? autolinker.link(feature.properties['Other Class B Perc.'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Other Class C Perc.</th>\
-                        <td>' + (feature.properties['Other Class C Perc.'] !== null ? autolinker.link(feature.properties['Other Class C Perc.'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Other Class A Perc.</th>\
-                        <td>' + (feature.properties['Other Class A Perc.'] !== null ? autolinker.link(feature.properties['Other Class A Perc.'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Number One</th>\
-                        <td>' + (feature.properties['Number One'] !== null ? autolinker.link(feature.properties['Number One'].toLocaleString()) : '') + '</td>\
-                    </tr>\
-                    <tr>\
-                        <th scope="row">Number Two</th>\
-                        <td>' + (feature.properties['Number Two'] !== null ? autolinker.link(feature.properties['Number Two'].toLocaleString()) : '') + '</td>\
+                        <th scope="row">Other Class A</th>\
+                        <td>' + (feature.properties['Other Class A'] !== null ? autolinker.link(feature.properties['Other Class A'].toLocaleString()) : '') + '</td>\
                     </tr>\
                 </table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -366,7 +340,7 @@
         }
 
         function style_OtherClassB_3_0(feature) {
-            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 23.236164 ) {
+            if (feature.properties['Other Class B Perc.'] >= 0.050916 && feature.properties['Other Class B Perc.'] <= 0.616698 ) {
                 return {
                 pane: 'pane_OtherClassB_3',
                 opacity: 1,
@@ -381,7 +355,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 45.777989 ) {
+            if (feature.properties['Other Class B Perc.'] >= 0.616698 && feature.properties['Other Class B Perc.'] <= 1.263194 ) {
                 return {
                 pane: 'pane_OtherClassB_3',
                 opacity: 1,
@@ -396,7 +370,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 45.777989 && feature.properties['Cannabis Perc.'] <= 63.899139 ) {
+            if (feature.properties['Other Class B Perc.'] >= 1.263194 && feature.properties['Other Class B Perc.'] <= 3.062426 ) {
                 return {
                 pane: 'pane_OtherClassB_3',
                 opacity: 1,
@@ -411,7 +385,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 63.899139 && feature.properties['Cannabis Perc.'] <= 71.752165 ) {
+            if (feature.properties['Other Class B Perc.'] >= 3.062426 && feature.properties['Other Class B Perc.'] <= 5.848261 ) {
                 return {
                 pane: 'pane_OtherClassB_3',
                 opacity: 1,
@@ -426,7 +400,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 71.752165 && feature.properties['Cannabis Perc.'] <= 82.418813 ) {
+            if (feature.properties['Other Class B Perc.'] >= 5.848261 && feature.properties['Other Class B Perc.'] <= 9.022556 ) {
                 return {
                 pane: 'pane_OtherClassB_3',
                 opacity: 1,
@@ -477,7 +451,7 @@
         }
 
         function style_OtherClassA_4_0(feature) {
-            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 23.236164 ) {
+            if (feature.properties['Other Class A Perc.'] >= 0.000000 && feature.properties['Other Class A Perc.'] <= 0.781250 ) {
                 return {
                 pane: 'pane_OtherClassA_4',
                 opacity: 1,
@@ -492,7 +466,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 23.236164 && feature.properties['Cannabis Perc.'] <= 45.777989 ) {
+            if (feature.properties['Other Class A Perc.'] >= 0.781250 && feature.properties['Other Class A Perc.'] <= 1.502227 ) {
                 return {
                 pane: 'pane_OtherClassA_4',
                 opacity: 1,
@@ -507,7 +481,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 45.777989 && feature.properties['Cannabis Perc.'] <= 63.899139 ) {
+            if (feature.properties['Other Class A Perc.'] >= 1.502227 && feature.properties['Other Class A Perc.'] <= 3.797468 ) {
                 return {
                 pane: 'pane_OtherClassA_4',
                 opacity: 1,
@@ -522,7 +496,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 63.899139 && feature.properties['Cannabis Perc.'] <= 71.752165 ) {
+            if (feature.properties['Other Class A Perc.'] >= 3.797468 && feature.properties['Other Class A Perc.'] <= 10.768501 ) {
                 return {
                 pane: 'pane_OtherClassA_4',
                 opacity: 1,
@@ -537,7 +511,7 @@
                 interactive: false,
             }
             }
-            if (feature.properties['Cannabis Perc.'] >= 71.752165 && feature.properties['Cannabis Perc.'] <= 82.418813 ) {
+            if (feature.properties['Other Class A Perc.'] >= 10.768501 && feature.properties['Other Class A Perc.'] <= 31.084337 ) {
                 return {
                 pane: 'pane_OtherClassA_4',
                 opacity: 1,
@@ -1884,7 +1858,7 @@
                 weight: 1.0, 
                 fill: true,
                 fillOpacity: 1,
-                fillColor: 'rgba(148,224,100,1.0)',
+                fillColor: 'rgba(58,211,109,1.0)',
                 interactive: false,
             }
                     break;
@@ -1899,7 +1873,7 @@
                 weight: 1.0, 
                 fill: true,
                 fillOpacity: 1,
-                fillColor: 'rgba(81,137,227,1.0)',
+                fillColor: 'rgba(151,112,228,1.0)',
                 interactive: false,
             }
                     break;
@@ -1914,7 +1888,7 @@
                 weight: 1.0, 
                 fill: true,
                 fillOpacity: 1,
-                fillColor: 'rgba(211,75,130,1.0)',
+                fillColor: 'rgba(212,90,29,1.0)',
                 interactive: false,
             }
                     break;
@@ -1933,7 +1907,6 @@
             style: style_Secondmostcommondrug_16_0,
         });
         bounds_group.addLayer(layer_Secondmostcommondrug_16);
-        map.addLayer(layer_Secondmostcommondrug_16);
         var overlaysTree = [
             {label: 'Second most common drug<br /><table><tr><td style="text-align: center;"><img src="legend/Secondmostcommondrug_16_Cocaine0.png" /></td><td>Cocaine </td></tr><tr><td style="text-align: center;"><img src="legend/Secondmostcommondrug_16_Crack1.png" /></td><td>Crack </td></tr><tr><td style="text-align: center;"><img src="legend/Secondmostcommondrug_16_Morphine2.png" /></td><td>Morphine </td></tr></table>', layer: layer_Secondmostcommondrug_16},
         {label: '<b>Drugs by Percentage</b>', selectAllCheckbox: true, children: [
@@ -1948,11 +1921,11 @@
             {label: 'Amphetemines<br /><table><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_0050660.png" /></td><td>0.05 - 0.66</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_0661381.png" /></td><td>0.66 - 1.38</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_1382342.png" /></td><td>1.38 - 2.34</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_234443.png" /></td><td>2.34 - 4.4</td></tr><tr><td style="text-align: center;"><img src="legend/Amphetemines_7_446334.png" /></td><td>4.4 - 6.33</td></tr></table>', layer: layer_Amphetemines_7},
             {label: 'Morphine<br /><table><tr><td style="text-align: center;"><img src="legend/Morphine_6_000560.png" /></td><td>0 - 0.056</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_005601661.png" /></td><td>0.056 - 0.166</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_016602442.png" /></td><td>0.166 - 0.244</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_024404343.png" /></td><td>0.244 - 0.434</td></tr><tr><td style="text-align: center;"><img src="legend/Morphine_6_043406174.png" /></td><td>0.434 - 0.617</td></tr></table>', layer: layer_Morphine_6},
             {label: 'Nitrous Oxide<br /><table><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_00490.png" /></td><td>0 - 0.49</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_0491151.png" /></td><td>0.49 - 1.15</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_1151752.png" /></td><td>1.15 - 1.75</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_1752483.png" /></td><td>1.75 - 2.48</td></tr><tr><td style="text-align: center;"><img src="legend/NitrousOxide_5_2484554.png" /></td><td>2.48 - 4.55</td></tr></table>', layer: layer_NitrousOxide_5},
-            {label: 'Other Class A<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_2322320.png" /></td><td>23.2 - 23.2</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_2324581.png" /></td><td>23.2 - 45.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_4586392.png" /></td><td>45.8 - 63.9</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_6397183.png" /></td><td>63.9 - 71.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_7188244.png" /></td><td>71.8 - 82.4</td></tr></table>', layer: layer_OtherClassA_4},
-            {label: 'Other Class B<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_2322320.png" /></td><td>23.2 - 23.2</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_2324581.png" /></td><td>23.2 - 45.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_4586392.png" /></td><td>45.8 - 63.9</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_6397183.png" /></td><td>63.9 - 71.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_7188244.png" /></td><td>71.8 - 82.4</td></tr></table>', layer: layer_OtherClassB_3},
+            {label: 'Other Class A<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_00780.png" /></td><td>0 - 0.78</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_078151.png" /></td><td>0.78 - 1.5</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_15382.png" /></td><td>1.5 - 3.8</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_3810773.png" /></td><td>3.8 - 10.77</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassA_4_107731084.png" /></td><td>10.77 - 31.08</td></tr></table>', layer: layer_OtherClassA_4},
+            {label: 'Other Class B<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_0050620.png" /></td><td>0.05 - 0.62</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_0621261.png" /></td><td>0.62 - 1.26</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_1263062.png" /></td><td>1.26 - 3.06</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_3065853.png" /></td><td>3.06 - 5.85</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassB_3_5859024.png" /></td><td>5.85 - 9.02</td></tr></table>', layer: layer_OtherClassB_3},
             {label: 'Other Class C<br /><table><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_00450.png" /></td><td>0 - 0.45</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_0451221.png" /></td><td>0.45 - 1.22</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_1222622.png" /></td><td>1.22 - 2.62</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_2626043.png" /></td><td>2.62 - 6.04</td></tr><tr><td style="text-align: center;"><img src="legend/OtherClassC_2_60411364.png" /></td><td>6.04 - 11.36</td></tr></table>', layer: layer_OtherClassC_2},]},
             {label: '<img src="legend/Information_1.png" /> Information', layer: layer_Information_1},
-            {label: " ", layer: layer__0, radioGroup: 'bm' },]
+            {label: "Basemap", layer: layer_Basemap_0, radioGroup: 'bm' },]
         var lay = L.control.layers.tree(null, overlaysTree,{
             //namedToggle: true,
             //selectorBack: false,
